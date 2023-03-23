@@ -1,0 +1,25 @@
+.wrapper {
+  @apply mx-96;
+  .heading {
+    @apply flex my-20 justify-center;
+  }
+  .image {
+    > img {
+      @apply w-72 shadow-2xl;
+    }
+  }
+  .info {
+    @apply mx-10 max-w-lg;
+    > * {
+      @apply pb-10;
+    }
+  }
+  .description {
+    > h1 {
+      @apply mb-5;
+    }
+  }
+  h1 {
+    @apply font-bold text-2xl;
+  }
+}

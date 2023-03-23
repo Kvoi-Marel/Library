@@ -1,0 +1,24 @@
+.wrapper {
+  @apply flex flex-wrap justify-center mx-32;
+}
+.card {
+  @apply w-60  mx-5 my-3 border border-gray-800 rounded-xl bg-gray-200 transition-all duration-300;
+
+  img {
+    @apply w-32 py-2 m-auto;
+  }
+  .info {
+    @apply text-left m-auto px-3;
+  }
+  h3 {
+    @apply font-bold;
+  }
+
+  .author {
+    @apply pb-2;
+  }
+
+  &:hover {
+    @apply scale-110;
+  }
+}
