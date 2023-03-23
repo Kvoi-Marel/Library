@@ -114,6 +114,7 @@ const Main = () => {
   const sortBook = (sort: string, variant: string) => {
     dispatch(setSelectedSort(sort))
     dispatch(setVariant(variant))
+    dispatch(setSearch(""))
     firstSort(sort, variant)
   }
 
