@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import axios from "axios"
 
-import styles from "./Header.module.scss"
+import styles from "./Main.module.scss"
 
 import BookItem from "../BookItem/BookItem"
 import { MySelect } from "./MySelect/MySelect"
@@ -18,7 +18,7 @@ import {
   setLoading,
 } from "../../store/bookSlice"
 
-const Header = () => {
+const Main = () => {
   const {
     count,
     selectedSort,
@@ -201,4 +201,4 @@ const Header = () => {
   )
 }
 
-export default Header
+export default Main
