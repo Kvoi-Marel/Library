@@ -15,7 +15,8 @@
     }
   }
   .description {
-    > h1 {
+    > h1,
+    p {
       @apply mb-5;
     }
   }

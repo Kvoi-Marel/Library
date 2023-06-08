@@ -8,6 +8,7 @@ const BookPage = () => {
   const params = useParams()
   const [info, setInfo] = useState<IBook>({
     id: "",
+    etag: "",
     volumeInfo: {
       title: "",
       description: "",
@@ -29,14 +30,13 @@ const BookPage = () => {
   useEffect(() => {
     getbyId(params.id!)
   }, [])
-  console.log(info)
 
   return (
     <div className={styles.wrapper}>
       <div className={styles.heading}>
         <div className={styles.image}>
           <img
-            src={info.volumeInfo.imageLinks.thumbnail}
+            src={info.volumeInfo.imageLinks?.thumbnail}
             alt={info.volumeInfo.title}
           />
         </div>
@@ -52,7 +52,7 @@ const BookPage = () => {
       </div>
       <div className={styles.description}>
         <h1>Description</h1>
-        <div>{info.volumeInfo.description}</div>
+        <p>{info.volumeInfo.description}</p>
       </div>
     </div>
   )

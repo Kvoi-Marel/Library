@@ -1,126 +1,62 @@
-import React, { useEffect, useState } from "react"
-import axios from "axios"
+import React, { useEffect } from "react"
 
 import styles from "./Main.module.scss"
 
 import BookItem from "../BookItem/BookItem"
 import { MySelect } from "./MySelect/MySelect"
 import { useAppDispatch, useAppSelector } from "../../store/hooks"
-import {
-  increaseIndex,
-  increaseSearchIndex,
-  setIndex,
-  setSearch,
-  setSearchIndex,
-  updateCount,
-  setSelectedSort,
-  setVariant,
-  setLoading,
-} from "../../store/bookSlice"
+import { setSearch, setSelectedSort, setVariant } from "../../store/bookSlice"
+import { useApiService } from "../../services/api.service"
 
 const Main = () => {
-  const {
-    count,
-    selectedSort,
-    variant,
-    search,
-    index,
-    searchIndex,
-    isLoading,
-  } = useAppSelector((state) => state.books)
+  const { count, selectedSort, variant, search, index, isLoading } =
+    useAppSelector((state) => state.books)
+
   const dispatch = useAppDispatch()
 
-  const [bookData, setBookData] = useState([])
+  const {
+    getSortedBooks,
+    loadSortedBooks,
+    getSearchedBooks,
+    loadSearchedBooks,
+  } = useApiService()
 
-  const Search = async (search: string, index: number) => {
-    try {
-      const response = await axios.get(
-        ` https://www.googleapis.com/books/v1/volumes?q=
-          intitle:${search}
-            &maxResults=30&startIndex=${index}&key=AIzaSyA_GJ4qpjjJWZxmvNCp0c_M9kWRprLzTEI`
-      )
-      if (!response) {
-        throw new Error("Server error")
-      }
-      setBookData(bookData.concat(response.data.items))
+  // const getApi = async (option: string) => {
+  //   try {
+  //     dispatch(setLoading(true))
+  //     const response = await axios.get(
+  //       ` https://www.googleapis.com/books/v1/volumes?q=${option}&key=${api}`
+  //       )
+  //       if (!response) {
+  //         throw new Error("Server error")
+  //       }
+  //       if(option === firstLoadOption || firstSortOption){
+  //     dispatch(setBookData(response.data.items))
+  //     dispatch(setLoading(false))
+  //     dispatch(updateCount(response.data.totalItems))}
+  //     else{}
+  //   } catch (error: any) {
+  //     return error.message
+  //   }
+  // }
 
-      dispatch(updateCount(response.data.totalItems))
-      dispatch(increaseSearchIndex(30))
-    } catch (error: any) {
-      return error.message
-    }
-  }
-
-  const firstGetApi = async (search: string) => {
-    dispatch(setLoading(true))
-    try {
-      const response = await axios.get(
-        ` https://www.googleapis.com/books/v1/volumes?q=
-        intitle:${search}
-          &maxResults=30&startIndex=0&key=AIzaSyA_GJ4qpjjJWZxmvNCp0c_M9kWRprLzTEI`
-      )
-      if (!response) {
-        throw new Error("Server error")
-      }
-      setBookData(response.data.items)
-      dispatch(setLoading(false))
-      dispatch(updateCount(response.data.totalItems))
-      dispatch(setSearchIndex(30))
-    } catch (error: any) {
-      return error.message
-    }
-  }
-  const sortByCategories = async (
-    category: string,
-    variant: string,
-    index: number
-  ) => {
-    try {
-      const response = await axios.get(
-        ` https://www.googleapis.com/books/v1/volumes?q=subject:${category}&orderBy=${variant}&maxResults=30&startIndex=${index}&key=AIzaSyA_GJ4qpjjJWZxmvNCp0c_M9kWRprLzTEI`
-      )
-      if (!response) {
-        throw new Error("Server error")
-      }
-      setBookData(bookData.concat(response.data.items))
-      dispatch(updateCount(response.data.totalItems))
-      dispatch(increaseIndex(30))
-    } catch (error: any) {
-      return error.message
-    }
-  }
-  const firstSort = async (category: string, variant: string) => {
-    dispatch(setLoading(true))
-    try {
-      const response = await axios.get(
-        ` https://www.googleapis.com/books/v1/volumes?q=subject:${category}&orderBy=${variant}&maxResults=30&startIndex=0&key=AIzaSyA_GJ4qpjjJWZxmvNCp0c_M9kWRprLzTEI`
-      )
-      if (!response) {
-        throw new Error("Server error")
-      }
-      setBookData(response.data.items)
-      dispatch(setLoading(false))
-      dispatch(updateCount(response.data.totalItems))
-      dispatch(setIndex(30))
-    } catch (error: any) {
-      return error.message
-    }
-  }
   const searchBook = (evt: React.KeyboardEvent<HTMLInputElement>) => {
     if (evt.key === "Enter") {
-      firstGetApi(search)
+      getSearchedBooks()
     }
   }
-  const sortBook = (sort: string, variant: string) => {
-    dispatch(setSelectedSort(sort))
-    dispatch(setVariant(variant))
+  const sortBook = () => {
     dispatch(setSearch(""))
-    firstSort(sort, variant)
+    getSortedBooks()
   }
 
   useEffect(() => {
-    firstSort(selectedSort, variant)
+    getSortedBooks()
   }, [])
+
+  useEffect(() => {
+    sortBook()
+  }, [selectedSort, variant])
 
   return (
     <>
@@ -134,7 +70,7 @@ const Main = () => {
             onChange={(e) => dispatch(setSearch(e.target.value))}
             onKeyPress={searchBook}
           />
-          <button className={styles.button} onClick={() => firstGetApi(search)}>
+          <button className={styles.button} onClick={() => getSearchedBooks()}>
             Search
           </button>
           <h1>Sort books</h1>
@@ -170,7 +106,9 @@ const Main = () => {
                   value: "poetry",
                 },
               ]}
-              onChange={(selectedSort) => sortBook(selectedSort, variant)}
+              onChange={(selectedSort) =>
+                dispatch(setSelectedSort(selectedSort))
+              }
             />
             <MySelect
               defaultValue="relevance"
@@ -183,20 +121,19 @@ const Main = () => {
                   value: "newest",
                 },
               ]}
-              onChange={(variant) => sortBook(selectedSort, variant)}
+              onChange={(variant) => dispatch(setVariant(variant))}
             />
           </div>
         </div>
       </div>
       <h1>Books found: {count}</h1>
-      {isLoading ? <div>Loading...</div> : <BookItem book={bookData} />}
-      {!search && index <= count && (
-        <button onClick={() => sortByCategories(selectedSort, variant, index)}>
-          Load more
-        </button>
+      <BookItem />
+      {!search && index <= count && !isLoading && (
+        <button onClick={() => loadSortedBooks()}>Load more</button>
       )}
-      {search && searchIndex <= count && (
-        <button onClick={() => Search(search, searchIndex)}>Load more</button>
+      {isLoading && <div className={styles.loading}>Loading...</div>}
+      {search && index <= count && !isLoading && (
+        <button onClick={() => loadSearchedBooks()}>Load more</button>
       )}
     </>
   )
