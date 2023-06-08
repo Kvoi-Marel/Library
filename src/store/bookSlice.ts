@@ -1,23 +1,7 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 import { RootState } from "."
 import { IBook } from "../components/BookPage/BookPage.interface"
-import axios from "axios"
-
-const api: string = "AIzaSyA_GJ4qpjjJWZxmvNCp0c_M9kWRprLzTEI"
-
-export const getSortedBooks = createAsyncThunk(
-  "book/getSortedBooks",
-  async (option: string, { dispatch }) => {
-    const response = await axios.get(
-      ` https://www.googleapis.com/books/v1/volumes?q=
-      ${option}&key=${api}`
-    )
-    dispatch(setBookData(response.data.items))
-    dispatch(updateCount(response.data.totalItems))
-    return response
-  }
-)
 
 const bookData: IBook[] = []
 const bookSlice = createSlice({
@@ -56,20 +40,6 @@ const bookSlice = createSlice({
     setLoading: (state, action) => {
       state.isLoading = action.payload
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(getSortedBooks.pending, (state) => {
-        state.isLoading = true
-      })
-      .addCase(getSortedBooks.fulfilled, (state, action) => {
-        state.isLoading = false
-        state.index = 30
-      })
-    // .addCase(getSortedBooks.rejected, (state,action)=>{
-    //   state.isLoading = false
-
-    // })
   },
 })
 

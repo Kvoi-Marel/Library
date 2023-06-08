@@ -21,25 +21,6 @@ const Main = () => {
     loadSearchedBooks,
   } = useApiService()
 
-  // const getApi = async (option: string) => {
-  //   try {
-  //     dispatch(setLoading(true))
-  //     const response = await axios.get(
-  //       ` https://www.googleapis.com/books/v1/volumes?q=${option}&key=${api}`
-  //       )
-  //       if (!response) {
-  //         throw new Error("Server error")
-  //       }
-  //       if(option === firstLoadOption || firstSortOption){
-  //     dispatch(setBookData(response.data.items))
-  //     dispatch(setLoading(false))
-  //     dispatch(updateCount(response.data.totalItems))}
-  //     else{}
-  //   } catch (error: any) {
-  //     return error.message
-  //   }
-  // }
-
   const searchBook = (evt: React.KeyboardEvent<HTMLInputElement>) => {
     if (evt.key === "Enter") {
       getSearchedBooks()
